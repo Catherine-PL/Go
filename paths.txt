@@ -1,0 +1,4 @@
+cd("d:/Biblioteka/Studia/V semestr/PWiR/GO").
+cd("d:/Biblioteka/Studia/V semestr/PWiR").
+cd("d:/Zainstalowane/Eclipse/Go/core/src/go/game").
+
