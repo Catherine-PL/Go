@@ -1,7 +1,7 @@
 	-module(bs).
 	-export([getTestBoard/0, getTestList/0, getTestNeighbourList/0, 
 
-          init/1, boardPrint/2, compareBoards/2, generateFrame/1,
+          init/1, boardPrint/2, compareBoards/2, generateFrame/1, listBoard/2,
 
           getAllColor/3, checkChainsByColor/2,  deleteChainsList/2,
           deleteChain/2, hasChainLiberties/2, getChains/2, getChainsRepeated/2, 
@@ -147,17 +147,17 @@ compareBoards([board,[{_,A}|T],Size],[board,[{_,A2}|T2],Size]) ->
 
 %policz wyniki i wyświetl kto wygrał. Białe dostają komi = 6.5
 whoWon([board,[{{X1,Y1},A}|T],Size]) ->
-{Black,White} = countTerritories(listTerritoriesSizeOwner(getTerritories([board,[{{X1,Y1},A}|T],Size]),[board,[{{X1,Y1},A}|T],Size],[ ]),{0,0}),
-BlackScore = len(getAllColor(b,[board,[{{X1,Y1},A}|T],Size],[ ])) + Black,
-WhiteScore = 6 + len(getAllColor(w,[board,[{{X1,Y1},A}|T],Size],[ ])) + White,
-if
-  BlackScore> WhiteScore ->
-    black;
-  BlackScore< WhiteScore ->
-    white;
-  BlackScore== WhiteScore ->
-    tie
-end.
+  {Black,White} = countTerritories(listTerritoriesSizeOwner(getTerritories([board,[{{X1,Y1},A}|T],Size]),[board,[{{X1,Y1},A}|T],Size],[ ]),{0,0}),
+  BlackScore = len(getAllColor(b,[board,[{{X1,Y1},A}|T],Size],[ ])) + Black,
+  WhiteScore = 6 + len(getAllColor(w,[board,[{{X1,Y1},A}|T],Size],[ ])) + White,
+  if
+    BlackScore> WhiteScore ->
+      black;
+    BlackScore< WhiteScore ->
+      white;
+    BlackScore== WhiteScore ->
+      tie
+  end.
 
 %policz wynik i zwróć krotkę {punkty czarne, punkty białe}
 countTerritories([ ],{Black,White}) ->
@@ -172,6 +172,17 @@ countTerritories([{A,O}|T],{Black,White}) ->
       Bufor = {Black,White + A}
   end,
   countTerritories(T,Bufor).
+
+
+
+%zamien Boarda na prostą listę zawierającą informacje o b/w/o
+% bs:listBoard(bs:getTestBoard(),[ ]).
+listBoard([board,[{_,H}],_],Bufor) ->
+  Bufor ++ [H];
+
+listBoard([board,[{_,H}|T],Y],Bufor) ->
+  Bufor2=Bufor ++ [H],
+  listBoard([board,T,Y],Bufor2).
 
 
 
