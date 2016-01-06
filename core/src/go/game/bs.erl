@@ -27,17 +27,17 @@
 % main:boardPrint(main:getTestBoard(),0).
 getTestBoard() ->
 [board,[{{1,1},b},
-  {{1,2},o},
+  {{1,2},w},
   {{1,3},w},
   {{1,4},w},
-  {{1,5},o},
+  {{1,5},w},
   {{2,1},w},
-  {{2,2},b},
-  {{2,3},b},
-  {{2,4},b},
+  {{2,2},o},
+  {{2,3},w},
+  {{2,4},w},
   {{2,5},o},
   {{3,1},b},
-  {{3,2},b},
+  {{3,2},w},
   {{3,3},w},
   {{3,4},w},
   {{3,5},b},
@@ -209,6 +209,12 @@ getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],Bufor) ->
 checkChainsByColor(Color, [board,[{{X1,Y1},A}|T],Size]) ->
   List = getChains(getChainsRepeated(listNeighbourLists(getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],[ ]),[ ]),[ ]),[ ]),
   Z = (filter(fun(X) -> not(hasChainLiberties (X,[board,[{{X1,Y1},A}|T],Size])) end, List)),
+  %test
+  H=getChainsRepeated(listNeighbourLists(getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],[ ]),[ ]),[ ]),
+  J=listNeighbourLists(getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],[ ]),[ ]),
+  K=getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],[ ]),
+
+  
   deleteChainsList(Z,[board,[{{X1,Y1},A}|T],Size]).
 
 %usun wszystkie lancuchy z listy
@@ -283,12 +289,44 @@ territorySizeOwner([{X,Y}|T1],[board,[{{X1,Y1},A}|T],Size],White,Black,Amount) -
 %wyczysc liste z getChainsRepeated na postawie listy z Repeated. Bufor [].
 getChains([ ], Bufor) ->
   Bufor;
+
+
 getChains([H|T], Bufor) ->
-  Z = (filter(fun(X) -> not(listHasSameItem (X,H)) end, T)),
-  Bufor2 = Bufor ++ [H],  
+  Q= remove_dups(flatten(filter(fun(G) -> listHasSameItem (G,H) end, T))),
+  W=remove_dups(Q++H),
+  if 
+    Q /= [] ->
+       Z = [W] ++ (filter(fun(X) -> not(listHasSameItem (X,H)) end, T)),
+       Bufor2=Bufor;
+    true ->
+       Z = (filter(fun(X) -> not(listHasSameItem (X,H)) end, T)),
+       Bufor2=Bufor ++ [W]
+  end,
   getChains(Z,Bufor2).
 
-%main:getChainsRepeated(main:listNeighbourLists(main:getAllColor(b,main:getTestBoard(),[ ]),[ ]),[ ]).
+%inna wersja getChains
+%getChains([ ], Bufor) ->
+%  Bufor;
+%getChains([H|T], Bufor) ->
+%  Z = (filter(fun(X) -> not(listHasSameItem (X,H)) end, T)),
+%  Q= remove_dups(flatten(filter(fun(G) -> listHasSameItem (G,H) end, T))),
+
+%  Bufor2 = Bufor ++ [Q],  
+%  getChains(Z,Bufor2).
+
+%oryginalna wersja
+%bs:getChains(bs:getChainsRepeated(bs:listNeighbourLists(bs:getAllColor(b,bs:getTestBoard(),[ ]),[ ]),[ ]),[ ]).
+%wyczysc liste z getChainsRepeated na postawie listy z Repeated. Bufor [].
+%getChains([ ], Bufor) ->
+%  Bufor;
+%getChains([H|T], Bufor) ->
+%  Z = (filter(fun(X) -> not(listHasSameItem (X,H)) end, T)),
+%  Bufor2 = Bufor ++ [H],  
+%  getChains(Z,Bufor2).
+
+
+
+%bs:getChainsRepeated(bs:listNeighbourLists(bs:getAllColor(b,bs:getTestBoard(),[ ]),[ ]),[ ]).
 %wygeneruj liste łańcuchów na podstawie listy sasiadow listNeighbourLists.
 %usun duplikaty W listach
 %pomocnicza. Bufor [].
@@ -325,30 +363,50 @@ listNeighbourLists([{X,Y}|T],Bufor) ->
 %sprawdza: czy cos tam juz nie stoi, czy otoczenie nie jest wrogie, czy indeks jest ok,czy ruch się nie powtarza
 putStoneChecked(Color,X,Y,[[board,[{{X1,Y1},A}|T],Size], SecondBoard]) ->
   LenMy=len(getNeighboursByColor(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0)),
+
   LenB = len(getNeighboursByColor(b,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0)),
   LenW= len(getNeighboursByColor(w,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0)),
+  LenO=len(getNeighboursByColor(o,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0)),
+% io:fwrite("LenMy is  ~p ", [LenMy]),
+% io:fwrite("LenB is  ~p ", [LenB]),
+ % io:fwrite("LenW is  ~p ", [LenW]),
+   %trzeba pobrać kolor tego czegoś
+   ThisColor=getColor(X,Y,[board,[{{X1,Y1},A}|T],Size]),
   if
-      (LenMy==0) and ((LenB==4)or (LenW==4)) ->
+      (ThisColor =/=o) ->
         [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
-      (A=/=o) ->
+      %(LenMy==0) and ((LenB==4)or (LenW==4)) ->
+      %io:fwrite("h211ehehe ", [ ]),
+        %[[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
+     % (LenMy==0) and  (LenO==0) and ((LenB==3)or (LenW==3)) ->
+     % io:fwrite("h211ehehe ", [ ]),
+      %  [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
+      (LenMy==0) and  (LenO==0)->
+     % io:fwrite("h211ehehe ", [ ]),
         [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
+
+
       (X<1) or (Y<1) ->
+     % io:fwrite("he2245hehe ", [ ]),
         [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
       true ->
-         [ putStone(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[board,[ ],Size]) , [board,[{{X1,Y1},A}|T],Size] ]
-  end,
-  case (putStone(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[board,[ ],Size])) of
-      SecondBoard->
-        [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
-      _Else ->
-        [ putStone(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[board,[ ],Size]) , [board,[{{X1,Y1},A}|T],Size] ]
+         %[ putStone(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[board,[ ],Size]) , [board,[{{X1,Y1},A}|T],Size] ]
+           case (putStone(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[board,[ ],Size])) of
+        SecondBoard->
+         %   io:fwrite("hehehe ", [ ]),
+          [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
+        _Else ->
+           % io:fwrite("heh2ehe ", [ ]),
+          [ putStone(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[board,[ ],Size]) , [board,[{{X1,Y1},A}|T],Size] ]
+        end
   end.
+  %tutaj był case poprzednio (jakby trzeba było wracać do tej wersji).
 
 %wstaw kamien o danym kolorze w dane pole danej planszy 
 %zwroc nowa, zmieniona plansze
 % Przykład użycia: main:putStone(1,2,1,main:init(3),[board,[ ],3]).
 putStone(_,_,_,[board,[ ],_],Bufor) -> 
-    Bufor;
+  Bufor;
 putStone(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[board,E,Size]) ->
   if 
       (X==X1) and (Y==Y1) ->

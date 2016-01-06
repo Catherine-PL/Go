@@ -39,6 +39,8 @@ remove_dups([H|T]) -> [H | [X || X <- remove_dups(T), X /= H]].
 %main:listHasSameItem([{1,3},{1,2},{2,3}],[{2,4},{1,2}]).
 listHasSameItem([],_) ->
   false;
+listHasSameItem(_,[]) ->
+  false;
 listHasSameItem({X1,Y1},{X2,Y2}) ->
   if
     (X1==X2) and (Y1==Y2) ->
