@@ -5,19 +5,20 @@
 -import(communication,[info/1,getTestBoard/0,listBoard/2,  boardState/1]).
 -import(bs,[
 
-          init/1, boardPrint/2, compareBoards/2,
-
-          getAllColor/3, checkChainsByColor/2, whoWon/1, putStoneChecked/4
+          init/1, boardPrint/2, compareBoards/2, getLongestChain/2,getChainLiberties/3,getAliveChains/3,
+          getAlmostDeadChain/2,
+          getAllColor/3, checkChainsByColor/2, whoWon/1, putStoneChecked/4,getChainLiberties/3,putStone/5
           ]).
 -import(list,[len/1]).
 -import(ai,[getPossibleBoards/4,countColor/3]).
-%the very start (registering only once)
+
+%prawdziwy start (jednorazowa rejestracja commmunication)
 s() ->
   register(boardstate,spawn(communication,boardState,[ ])),
   start().
 
 start() ->
-  io:format("Hullo~n",[]),
+  %io:format("Hullo~n",[]),
 	%{ok, [X]} = io:fread("Witaj w grze Go! Wybierz swój kolor (b-czarne, w-białe): ", "~d").
 	%PColor = io:get_line("Welcome! This is GO! Choose your color(b - black, w - white): "),
   %{ok,Size} = io:read("Welcome! This is GO! Choose board size(5,7,9,13 or 19): "),
@@ -181,21 +182,83 @@ move(Player,Color,[ActualBoard2, SecondBoard],Pass) ->
   %TODO jakaś inteligencja
   %TODO TODO TODO
   moveComp(Color,[ActualBoard, SecondBoard])->
+      [board,_,Size]=ActualBoard,
       %wszystkie wolne miejsca
-      AllColor=getAllColor(o,ActualBoard,[ ]),
+      %AllColorLen=len(getAllColor(Color,ActualBoard,[ ])),
+      AllColorLen=len(getAllColor(b,ActualBoard,[ ]))+len(getAllColor(w,ActualBoard,[ ])),
+      if
+        %opening strategy
+        AllColorLen<16 ->
+            AllColor2=getAllColor(o,[board,
+                                           [{{2,2},bs:getColor(2,2,ActualBoard)},
+                                            {{3,2},bs:getColor(3,2,ActualBoard)},
+                                            {{4,2},bs:getColor(4,2,ActualBoard)},
+                                            {{3,3},bs:getColor(3,3,ActualBoard)},
+
+                                            {{2,Size-1},bs:getColor(2,Size-1,ActualBoard)},
+                                            {{3,Size-1},bs:getColor(3,Size-1,ActualBoard)},
+                                            {{3,Size-2},bs:getColor(3,Size-2,ActualBoard)},
+                                            {{4,Size-1},bs:getColor(4,Size-1,ActualBoard)},
+
+                                            {{Size-1,2},bs:getColor(Size-1,2,ActualBoard)},
+                                            {{Size-2,2},bs:getColor(Size-2,2,ActualBoard)},
+                                            {{Size-2,3},bs:getColor(Size-2,3,ActualBoard)},
+                                            {{Size-3,2},bs:getColor(Size-3,2,ActualBoard)},
+                                            
+                                           {{Size-1,Size-1},bs:getColor(Size-1,Size-1,ActualBoard)},
+                                            {{Size-2,Size-1},bs:getColor(Size-2,Size-1,ActualBoard)},
+                                            {{Size-2,Size-2},bs:getColor(Size-2,Size-2,ActualBoard)},
+                                            {{Size-3,Size-1},bs:getColor(Size-3,Size-1,ActualBoard)}],Size],[ ]),
+            AllColor2Len=len(AllColor2),
+            if
+            AllColor2Len==0 ->
+              AllColor=getAllColor(o,ActualBoard,[ ]);
+              true->
+                AllColor=AllColor2
+            end;
+
+
+          %middle strategy
+        ((AllColorLen>15) and (AllColorLen<Size*4))  ->
+            Chain=getLongestChain(Color,ActualBoard),
+            AllColor=getChainLiberties(Chain,ActualBoard,[ ]);
+
+
+          %ending strategy - aggressive
+        AllColorLen>Size*4-1 ->
+            %pobierz Chain wroga, który ma najmniej liberties
+            if
+              Color==b ->
+                Chain=getAlmostDeadChain(w,ActualBoard);
+              Color==w ->
+                Chain=getAlmostDeadChain(b,ActualBoard)
+            end,
+           %AllColor to liberties tego Chaina
+            AllColor=getChainLiberties(Chain,ActualBoard,[ ]);
+
+        true->
+            AllColor=getAllColor(o,ActualBoard,[ ])
+      end,
+
        %zebranie Boardów dla każdego z ruchów
        PossibleBoards=getPossibleBoards(Color,AllColor,ActualBoard,self()),
-       %przepuszczenie tylko tych Boardów, które nie powodują utraty pionów
-
        PossibleLen=len(PossibleBoards),
+       LenC=len(AllColor),
        %jeżeli nie zrobił żadnego ruchu (bo się nie opłacało) to znaczy to pas
        if
-          PossibleLen==[] ->
-           [ActualBoard, ActualBoard];
+          LenC==1->
+              %ewentualność gdy ai nie chce zabić wroga
+              [{X11,Y11}]=AllColor,
+               [putStone(Color,X11,Y11,ActualBoard,[board,[ ],Size]),ActualBoard];
+
+          PossibleLen==0 ->
+              [ActualBoard, ActualBoard];
+
           true ->
              [Haaa|_] = PossibleBoards,
              [Haaa,ActualBoard]
        end.
+
 
 %COMMUNICATION JAVA-ERLANG
 

@@ -3,23 +3,7 @@
 package go.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import java.lang.Character;
-import java.io.IOException;
-
-import com.ericsson.otp.erlang.OtpErlangList;
-import com.ericsson.otp.erlang.OtpErlangAtom;
-import com.ericsson.otp.erlang.OtpErlangDecodeException;
-import com.ericsson.otp.erlang.OtpErlangExit;
-import com.ericsson.otp.erlang.OtpErlangObject;
-import com.ericsson.otp.erlang.OtpErlangPid;
-import com.ericsson.otp.erlang.OtpErlangTuple;
-import com.ericsson.otp.erlang.OtpMbox;
-import com.ericsson.otp.erlang.OtpNode;
 
 public class Graphics extends ApplicationAdapter {
 	private MainMenu mainMenu = new MainMenu();
@@ -54,7 +38,6 @@ public class Graphics extends ApplicationAdapter {
 	}
 
 	
-//TODO na razie mnie to nie interesuje	
 	public void dispose() {
 	      // dispose of all the native resources
 		

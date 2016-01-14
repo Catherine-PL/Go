@@ -40,13 +40,10 @@ listBoard([board,[{_,H}|T],Y],Bufor) ->
 
 info(GamePid) ->
     receive
-        stop ->
-            io:format("finished...~n",[]);         
+        stop ->       
         {PingId,Data1,Data2} ->
-            io:format("Data received~n",[]),
             GamePid ! {Data1,Data2};
         {PingId,Data1,Data2,Data3} ->
-            io:format("Data received~n",[]),
             GamePid ! {Data1,Data2,Data3}
     end.
  
@@ -55,11 +52,8 @@ boardState() ->
          [board,X,Y] ->
             true
     end,
-    io:fwrite("Board received!~n", []),
     receive
         {PingId,ping} ->
-            io:format("Ping~n",[]),
             PingId ! {self(),listBoard([board,X,Y],[ ])}
     end,
-    io:fwrite("Board sent!~n", []),
     boardState().

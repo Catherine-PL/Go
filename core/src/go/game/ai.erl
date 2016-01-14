@@ -26,7 +26,6 @@ getPossibleBoards(Color,AllColor,ActualBoard,Pid) ->
  receive
     {allboards,Boards} ->
        Boards
-       %getProfitableBoards(Color,Boards,ActualBoard,[ ])
  end.
 
 
@@ -72,6 +71,8 @@ getBoardOption( [{X,Y}|T],Color,ActualBoard,RPid)->
   %RPid = spawn(ai,receiveBoards,[[ ],Len,self()]),
   spawn(ai,getBoardOption,[T,Color,ActualBoard,RPid]),
   io:fwrite("I am in getBoardOption - after spawn  ", []),
+
+
   [NewBoard,OldBoard] =putStoneChecked(Color,X,Y,[ActualBoard, ActualBoard]),
   NewBoard2=isProfitable(Color,NewBoard,ActualBoard),
    if
@@ -106,10 +107,7 @@ getProfitableBoards(Color,[H|T],ActualBoard2,Bufor) ->
   ActualBoard=checkChainsByColor(Color, ActualBoard2),
   H2=checkChainsByColor(Color, H),
   AmountOld= len(getAllColor(Color,ActualBoard, [ ])),
- AmountNew=len(getAllColor(Color,H2, [ ])),
-
-  %AmountNew=countColor(Color,H,0),
-  %AmountOld=countColor(Color,ActualBoard,0),
+  AmountNew=len(getAllColor(Color,H2, [ ])),
   if
     AmountNew>=AmountOld ->
       getProfitableBoards(Color,T,ActualBoard,Bufor++[H2]);

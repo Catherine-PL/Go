@@ -1,39 +1,20 @@
 package go.game;
 
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
-
 import go.game.View;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-
-import java.lang.Character;
 import java.io.IOException;
-
 import com.ericsson.otp.erlang.OtpErlangInt;
-import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangAtom;
-import com.ericsson.otp.erlang.OtpErlangDecodeException;
-import com.ericsson.otp.erlang.OtpErlangExit;
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.ericsson.otp.erlang.OtpErlangPid;
 import com.ericsson.otp.erlang.OtpErlangTuple;
-import com.ericsson.otp.erlang.OtpMbox;
 import com.ericsson.otp.erlang.OtpNode;
 
 
@@ -45,7 +26,6 @@ public class Gameplay  extends View implements InputProcessor {
 	Map<Integer, Texture> backs;
 	Texture white;
 	Texture turntext;
-	//TODO zmienic potem,  true tylko do testów
 	boolean playerturn=true;
 	
 	
@@ -190,12 +170,6 @@ public void sendToErlang(String info1, int info2, int info3)
          if (self==null) self = new OtpNode("mynode", "test");
          if(mbox==null) mbox = self.createMbox("facserver");
 
-         if (self.ping(server, 2000)) {
-             //System.out.println("remote is up");
-         } else {
-             //System.out.println("remote is not up");
-             return;
-         }
      } catch (IOException e1) {
          e1.printStackTrace();
      }
@@ -210,8 +184,6 @@ public void sendToErlang(String info1, int info2, int info3)
 
   
 }
-
-
 
 @Override
 public boolean touchUp(int screenX, int screenY, int pointer, int button) {

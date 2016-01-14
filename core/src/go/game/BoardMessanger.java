@@ -1,9 +1,7 @@
 package go.game;
 
-import go.game.View.Screen;
 
 import java.io.IOException;
-
 import com.ericsson.otp.erlang.OtpErlangAtom;
 import com.ericsson.otp.erlang.OtpErlangDecodeException;
 import com.ericsson.otp.erlang.OtpErlangExit;
@@ -43,15 +41,7 @@ public class BoardMessanger extends View implements Runnable {
 		        try {
 		        	 if (self==null) self = new OtpNode("mynode", "test");
 		             if(mbox==null) mbox = self.createMbox("facserver");
-		             //self = new OtpNode("mynode", "test");
-		             //mbox = self.createMbox("facserver");
-		 
-		            if (self.ping(server, 2000)) {
-		                System.out.println("remote is up");
-		            } else {
-		                //System.out.println("remote is not up");
-		                return;
-		            }
+		             
 		        } catch (IOException e1) {
 		            e1.printStackTrace();
 		        }
@@ -70,12 +60,6 @@ public class BoardMessanger extends View implements Runnable {
 		                OtpErlangTuple rtuple = (OtpErlangTuple) robj;
 		                OtpErlangPid fromPid = (OtpErlangPid) (rtuple.elementAt(0));
 		                OtpErlangList rmsg = (OtpErlangList)rtuple.elementAt(1);
-		 
-		        //        System.out.println("Message: " + rmsg + " received from:  "
-	//	                        + fromPid.toString());
-		 
-		                //OtpErlangAtom ok = new OtpErlangAtom("stop");
-		               // mbox.send(fromPid, ok);
 		                board=cleanList(rmsg.toString().toCharArray()) ;
 		                break;
 		 

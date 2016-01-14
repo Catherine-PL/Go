@@ -1,5 +1,5 @@
 	-module(list).
-	-export([listContains/2,len/1,listHasSameItem/2,remove_dups/1,remove_dups_list/2]).
+	-export([listContains/2,len/1,listHasSameItem/2,remove_dups/1,remove_dups_list/2,getLongestList/2]).
 	-import(lists, [delete/2,map/2,foldl/3,foldr/3,seq/2, nth/2, filter/2, flatten/1]).
 
 
@@ -9,6 +9,28 @@ len([]) ->
    0;
 len([_|T]) -> 
   1 + len(T).
+
+
+%pobierz najdłuższą listę  z listy list
+getLongestList([H|[ ]],Bufor)->
+ HLen=len(H),
+  BLen=len(Bufor),
+  if
+    HLen>BLen ->
+      H;
+    true ->
+      Bufor
+  end;
+
+getLongestList([H|T],Bufor)->
+  HLen=len(H),
+  BLen=len(Bufor),
+  if
+    HLen>BLen ->
+      getLongestList(T,H);
+    true ->
+      getLongestList(T,Bufor)
+  end.
 
 
 %sprawdzenie czy lista posiada dany element

@@ -1,10 +1,10 @@
-	-module(bs).
+-module(bs).
 	-export([getTestBoard/0, getTestList/0, getTestNeighbourList/0, 
 
           init/1, boardPrint/2, compareBoards/2, generateFrame/1, listBoard/2,
 
-          getAllColor/3, checkChainsByColor/2,  deleteChainsList/2,
-          deleteChain/2, hasChainLiberties/2, getChains/2, getChainsRepeated/2, 
+          getAllColor/3, checkChainsByColor/2,  deleteChainsList/2, getChainLiberties/3, getLongestChain/2, getAliveChains/3,
+          deleteChain/2, hasChainLiberties/2, getChains/2, getChainsRepeated/2, getAlmostDeadChain/2,
           listNeighbourLists/2, territorySizeOwner/5, listTerritoriesSizeOwner/3,
           getTerritories/1, countTerritories/2, whoWon/1,
 
@@ -13,7 +13,7 @@
           ]).
   -import(lists, [delete/2,map/2,foldl/3,foldr/3,seq/2, 
                   nth/2, filter/2, flatten/1]).
-  -import(list, [listContains/2,len/1,listHasSameItem/2,
+  -import(list, [listContains/2,len/1,listHasSameItem/2,getLongestList/2,
                   remove_dups/1,remove_dups_list/2]).
 
 
@@ -24,7 +24,7 @@
 
 
 %plansza do testów
-% main:boardPrint(main:getTestBoard(),0).
+% bs:boardPrint(bs:getTestBoard(),0).
 getTestBoard() ->
 [board,[{{1,1},b},
   {{1,2},w},
@@ -77,7 +77,7 @@ init(Y) ->
       true
   end.
 
-
+%wyświetlanie planszy w konsoli (testy/granie w konsoli)
 generateFrame(Size) ->
   case Size of
     5 ->
@@ -123,7 +123,6 @@ boardPrint([board,[{_,A}|T],S],Y) ->
     true ->
        io:format(" ~p ", [A])
   end,
-   % io:format(" ~p ", [A]),
   if
       (Z rem S == 0 ) ->
           io:format(" |~p ~n", [trunc(Z/S)]);
@@ -208,14 +207,32 @@ getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],Bufor) ->
 %sprawdzenie chainów  z podanego boarda danego koloru i usunięcie tych, które nie mają liberties
 checkChainsByColor(Color, [board,[{{X1,Y1},A}|T],Size]) ->
   List = getChains(getChainsRepeated(listNeighbourLists(getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],[ ]),[ ]),[ ]),[ ]),
-  Z = (filter(fun(X) -> not(hasChainLiberties (X,[board,[{{X1,Y1},A}|T],Size])) end, List)),
-  %test
-  H=getChainsRepeated(listNeighbourLists(getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],[ ]),[ ]),[ ]),
-  J=listNeighbourLists(getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],[ ]),[ ]),
-  K=getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],[ ]),
-
-  
+  Z = (filter(fun(X) -> not(hasChainLiberties (X,[board,[{{X1,Y1},A}|T],Size])) end, List)),  
   deleteChainsList(Z,[board,[{{X1,Y1},A}|T],Size]).
+
+
+
+
+%przepusć tylko chainy które mają więcej niż 1 liberties
+getAliveChains([ ],[board,[{{X1,Y1},A}|T],Size],Bufor)->
+  Bufor;
+
+getAliveChains([H|T],[board,[{{X1,Y1},A}|T2],Size],Bufor)->
+  Liberties=getChainLiberties(H,[board,[{{X1,Y1},A}|T2],Size],[ ]),
+  LibLen=len(Liberties),
+  if
+    LibLen<3 ->
+      getAliveChains(T,[board,[{{X1,Y1},A}|T2],Size],Bufor);
+    true ->
+      getAliveChains(T,[board,[{{X1,Y1},A}|T2],Size],Bufor++[H])
+  end.
+
+
+%wybierz najdłuższego chaina
+getLongestChain(Color, [board,[{{X1,Y1},A}|T],Size]) ->
+  List = getChains(getChainsRepeated(listNeighbourLists(getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],[ ]),[ ]),[ ]),[ ]),
+  List2=getAliveChains(List,[board,[{{X1,Y1},A}|T],Size],[ ]),
+  getLongestList(List2,[ ]).
 
 %usun wszystkie lancuchy z listy
 deleteChainsList([ ],Bufor) ->
@@ -230,6 +247,34 @@ deleteChain([ ],Bufor) ->
 deleteChain([{X,Y}|T1],[board,[{{X1,Y1},A}|T],Size]) ->
   Bufor = deleteStone(X,Y,[board,[{{X1,Y1},A}|T],Size],[board,[ ],Size]),
   deleteChain(T1,Bufor).
+
+
+% pobranie wszystkich liberties łańcucha
+getChainLiberties([ ],_,Bufor) -> 
+  Bufor;
+getChainLiberties([{X,Y}|T1],[board,[{{X1,Y1},A}|T],Size],Bufor) ->
+  Bufor2=Bufor++getNeighboursByColor(o,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0),
+  getChainLiberties(T1,[board,[{{X1,Y1},A}|T],Size],Bufor2).
+
+
+%pobranie Chaina który ma najmniej liberties
+getAlmostDeadChain(Color, [board,[{{X1,Y1},A}|T],Size]) ->
+ ChainList = getChains(getChainsRepeated(listNeighbourLists(getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],[ ]),[ ]),[ ]),[ ]),
+ getAlmostDeadChain2(ChainList,[board,[{{X1,Y1},A}|T],Size],9999,[ ]).
+
+
+%pomocnicza dla getAlmostDeadChain, do Bufora wrzucić coś wielkiego, Bufor2 [] bo tam będzie ten łańcuch wynikowy
+getAlmostDeadChain2([ ], _,_,Bufor2)->
+  Bufor2;
+
+getAlmostDeadChain2([H2|T2], [board,[{{X1,Y1},A}|T],Size],Bufor,Bufor2)->
+  LenLib=len(getChainLiberties(H2,[board,[{{X1,Y1},A}|T],Size],[ ])),
+  if
+    LenLib>Bufor ->
+      getAlmostDeadChain2(T2, [board,[{{X1,Y1},A}|T],Size],Bufor, Bufor2);
+    LenLib=<Bufor ->
+      getAlmostDeadChain2(T2, [board,[{{X1,Y1},A}|T],Size],LenLib, H2)
+  end.
 
 
 % sprawdzanie, czy łancuch ma liberties
@@ -249,11 +294,6 @@ listTerritoriesSizeOwner([ ],_,Bufor) ->
 listTerritoriesSizeOwner([H|T1],[board,[{{X1,Y1},A}|T],Size],Bufor) ->
   Bufor2 = Bufor ++ [territorySizeOwner(H,[board,[{{X1,Y1},A}|T],Size],0,0,0)],
   listTerritoriesSizeOwner(T1,[board,[{{X1,Y1},A}|T],Size],Bufor2). 
-
-  %foldl(fun(X,Final)-> territorySizeOwner(X,[board,[{{X1,Y1},A}|T],Size],0,0,0)  end, [ ], Listofterritories).
-
-
-
 
 
 %lista wszystkich territories
@@ -276,6 +316,7 @@ territorySizeOwner([ ],_,White,Black,D) ->
     (Black==0) and (White>0) ->  
       {D,w}
   end;
+
 
 %  list:len(bs:getNeighboursByColor(b,1,2,bs:getTestBoard(),[ ],0)).
 territorySizeOwner([{X,Y}|T1],[board,[{{X1,Y1},A}|T],Size],White,Black,Amount) ->
@@ -303,27 +344,6 @@ getChains([H|T], Bufor) ->
        Bufor2=Bufor ++ [W]
   end,
   getChains(Z,Bufor2).
-
-%inna wersja getChains
-%getChains([ ], Bufor) ->
-%  Bufor;
-%getChains([H|T], Bufor) ->
-%  Z = (filter(fun(X) -> not(listHasSameItem (X,H)) end, T)),
-%  Q= remove_dups(flatten(filter(fun(G) -> listHasSameItem (G,H) end, T))),
-
-%  Bufor2 = Bufor ++ [Q],  
-%  getChains(Z,Bufor2).
-
-%oryginalna wersja
-%bs:getChains(bs:getChainsRepeated(bs:listNeighbourLists(bs:getAllColor(b,bs:getTestBoard(),[ ]),[ ]),[ ]),[ ]).
-%wyczysc liste z getChainsRepeated na postawie listy z Repeated. Bufor [].
-%getChains([ ], Bufor) ->
-%  Bufor;
-%getChains([H|T], Bufor) ->
-%  Z = (filter(fun(X) -> not(listHasSameItem (X,H)) end, T)),
-%  Bufor2 = Bufor ++ [H],  
-%  getChains(Z,Bufor2).
-
 
 
 %bs:getChainsRepeated(bs:listNeighbourLists(bs:getAllColor(b,bs:getTestBoard(),[ ]),[ ]),[ ]).
@@ -363,44 +383,29 @@ listNeighbourLists([{X,Y}|T],Bufor) ->
 %sprawdza: czy cos tam juz nie stoi, czy otoczenie nie jest wrogie, czy indeks jest ok,czy ruch się nie powtarza
 putStoneChecked(Color,X,Y,[[board,[{{X1,Y1},A}|T],Size], SecondBoard]) ->
   LenMy=len(getNeighboursByColor(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0)),
-
-  LenB = len(getNeighboursByColor(b,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0)),
-  LenW= len(getNeighboursByColor(w,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0)),
   LenO=len(getNeighboursByColor(o,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0)),
-% io:fwrite("LenMy is  ~p ", [LenMy]),
-% io:fwrite("LenB is  ~p ", [LenB]),
- % io:fwrite("LenW is  ~p ", [LenW]),
+
+
    %trzeba pobrać kolor tego czegoś
    ThisColor=getColor(X,Y,[board,[{{X1,Y1},A}|T],Size]),
   if
       (ThisColor =/=o) ->
         [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
-      %(LenMy==0) and ((LenB==4)or (LenW==4)) ->
-      %io:fwrite("h211ehehe ", [ ]),
-        %[[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
-     % (LenMy==0) and  (LenO==0) and ((LenB==3)or (LenW==3)) ->
-     % io:fwrite("h211ehehe ", [ ]),
-      %  [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
       (LenMy==0) and  (LenO==0)->
-     % io:fwrite("h211ehehe ", [ ]),
         [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
-
 
       (X<1) or (Y<1) ->
-     % io:fwrite("he2245hehe ", [ ]),
         [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
+
       true ->
-         %[ putStone(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[board,[ ],Size]) , [board,[{{X1,Y1},A}|T],Size] ]
            case (putStone(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[board,[ ],Size])) of
         SecondBoard->
-         %   io:fwrite("hehehe ", [ ]),
           [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
+
         _Else ->
-           % io:fwrite("heh2ehe ", [ ]),
           [ putStone(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[board,[ ],Size]) , [board,[{{X1,Y1},A}|T],Size] ]
         end
   end.
-  %tutaj był case poprzednio (jakby trzeba było wracać do tej wersji).
 
 %wstaw kamien o danym kolorze w dane pole danej planszy 
 %zwroc nowa, zmieniona plansze
@@ -437,7 +442,7 @@ getColor(X,Y,[board,[],_]) ->
 getColor(X,Y,[board,[{{X1,Y1},A}|T],Size]) ->
    if 
       (X==X1) and (Y==Y1) ->
-        Kolor = A;
+        A;
       true -> 
         getColor(X,Y,[board,T,Size])        
     end. 
@@ -447,7 +452,6 @@ getColor(X,Y,[board,[{{X1,Y1},A}|T],Size]) ->
 %pobranie listy współrzędnych sasiadów z góry, dołu i boków o danym kolorze
 %main:getNeighbours(b,3,3,main:getTestBoard(),[ ],0).
 %(bs:getNeighboursByColor(o,1,4,bs:getTestBoard(),[ ],0)).
-
 getNeighboursByColor(_,_,_,[board,[ ],_],Bufor,_) ->
   Bufor;
 getNeighboursByColor(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],Bufor,Counter) ->
