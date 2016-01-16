@@ -1,4 +1,4 @@
-//cd("d:/Zainstalowane/Eclipse/Go/core/src/go/game").
+// author: Katarzyna Kosiak
 
 package go.game;
 

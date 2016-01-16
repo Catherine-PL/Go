@@ -1,8 +1,8 @@
+// author: Katarzyna Kosiak
+
 package go.game;
 
 
-import java.util.ArrayList;
-import java.util.Random;
 
 import go.game.View;
 
@@ -11,9 +11,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.Input.Keys;
 
 
 
@@ -21,20 +19,32 @@ public class EndGame  extends View implements InputProcessor {
 
 	
 	SpriteBatch batch;
-	Texture black;
+	Texture backblack;
+	Texture backwhite;
 	
 	public void init()
 	{
 		batch = new SpriteBatch();
-		black=new Texture("black.png");
+		backwhite=new Texture("backwhite.png");
+		backblack=new Texture("backblack.png");
 	}
 	
 	public void batch()
 	{
+		Gdx.input.setInputProcessor(this);
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.begin();
-		//TODO
+		if(winner==3)
+		{
+			batch.draw(backwhite,0,0);
+		}
+		if(winner==2)
+		{
+			batch.draw(backblack,0,0);
+		}
+		
+
 		batch.end();	
 	}
 	
@@ -61,6 +71,9 @@ public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		int X=screenX;
 		int Y=screensizeY - screenY;
 	
+		
+		//touch QUIT
+		
 	}
     return false;
 }

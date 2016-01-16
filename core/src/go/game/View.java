@@ -1,3 +1,6 @@
+// author: Katarzyna Kosiak
+
+
 package go.game;
 
 import com.ericsson.otp.erlang.OtpMbox;
@@ -8,7 +11,7 @@ public abstract class View {
 	public enum Screen {
 	    MAINMENU, GAMEPLAY, ENDGAME,END}
 	
-	private static Screen view = Screen.MAINMENU;
+	static Screen view = Screen.MAINMENU;
 	final static int screensizeX=1000; 
 	final static int screensizeY=700; 
 	private static int boardsize=9; 
@@ -17,6 +20,7 @@ public abstract class View {
 	static OtpMbox mbox = null;
 	static String server = "server";
 	static char[] board;
+	static int winner;
 	
 	
 	public void init(){}

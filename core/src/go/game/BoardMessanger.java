@@ -1,7 +1,13 @@
+// author: Katarzyna Kosiak
+
+
 package go.game;
 
 
+import go.game.View.Screen;
+
 import java.io.IOException;
+import java.util.Arrays;
 import com.ericsson.otp.erlang.OtpErlangAtom;
 import com.ericsson.otp.erlang.OtpErlangDecodeException;
 import com.ericsson.otp.erlang.OtpErlangExit;
@@ -60,7 +66,28 @@ public class BoardMessanger extends View implements Runnable {
 		                OtpErlangTuple rtuple = (OtpErlangTuple) robj;
 		                OtpErlangPid fromPid = (OtpErlangPid) (rtuple.elementAt(0));
 		                OtpErlangList rmsg = (OtpErlangList)rtuple.elementAt(1);
-		                board=cleanList(rmsg.toString().toCharArray()) ;
+		                //checking for winner
+		                board=cleanList(rmsg.toString().toCharArray());
+		                char[] white={'w','i','e'};
+		                char[] black={'b','a','k'};
+
+		                if(Arrays.equals(board, white)==true)
+		                {
+		                	System.out.println("white is the winner");
+		                	view = Screen.ENDGAME;
+		                	winner=3;
+		                	return;
+		                }
+		                if(Arrays.equals(board, black))
+		                {
+		                	System.out.println("black is the winner");
+		                	view = Screen.ENDGAME;
+		                	winner=2;
+		                	return;
+		                }
+		                
+		                
+		                
 		                break;
 		 
 		            } catch (OtpErlangExit e) {

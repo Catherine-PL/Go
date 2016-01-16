@@ -1,20 +1,23 @@
+%% author: Katarzyna Kosiak
+
+
 -module(bs).
-	-export([getTestBoard/0, getTestList/0, getTestNeighbourList/0, 
+-export([getTestBoard/0, getTestList/0, getTestNeighbourList/0, 
 
-          init/1, boardPrint/2, compareBoards/2, generateFrame/1, listBoard/2,
+  init/1, boardPrint/2, compareBoards/2, generateFrame/1, listBoard/2,
 
-          getAllColor/3, checkChainsByColor/2,  deleteChainsList/2, getChainLiberties/3, getLongestChain/2, getAliveChains/3,
-          deleteChain/2, hasChainLiberties/2, getChains/2, getChainsRepeated/2, getAlmostDeadChain/2,
-          listNeighbourLists/2, territorySizeOwner/5, listTerritoriesSizeOwner/3,
-          getTerritories/1, countTerritories/2, whoWon/1,
+  getAllColor/3, checkChainsByColor/2,  deleteChainsList/2, getChainLiberties/3, getLongestChain/2, getAliveChains/3,
+  deleteChain/2, hasChainLiberties/2, getChains/2, getChainsRepeated/2, getAlmostDeadChain/2,
+  listNeighbourLists/2, territorySizeOwner/5, listTerritoriesSizeOwner/3,
+  getTerritories/1, countTerritories/2, whoWon/1,
 
-          putStone/5, deleteStone/4, getColor/3,getNeighbours/5,getNeighboursByColor/6,
-          putStoneChecked/4
-          ]).
-  -import(lists, [delete/2,map/2,foldl/3,foldr/3,seq/2, 
-                  nth/2, filter/2, flatten/1]).
-  -import(list, [listContains/2,len/1,listHasSameItem/2,getLongestList/2,
-                  remove_dups/1,remove_dups_list/2]).
+  putStone/5, deleteStone/4, getColor/3,getNeighbours/5,getNeighboursByColor/6,
+  putStoneChecked/4
+  ]).
+-import(lists, [delete/2,map/2,foldl/3,foldr/3,seq/2, 
+  nth/2, filter/2, flatten/1]).
+-import(list, [listContains/2,len/1,listHasSameItem/2,getLongestList/2,
+  remove_dups/1,remove_dups_list/2]).
 
 
 
@@ -27,38 +30,38 @@
 % bs:boardPrint(bs:getTestBoard(),0).
 getTestBoard() ->
 [board,[{{1,1},b},
-  {{1,2},w},
-  {{1,3},w},
-  {{1,4},w},
-  {{1,5},w},
-  {{2,1},w},
-  {{2,2},o},
-  {{2,3},w},
-  {{2,4},w},
-  {{2,5},o},
-  {{3,1},b},
-  {{3,2},w},
-  {{3,3},w},
-  {{3,4},w},
-  {{3,5},b},
-  {{4,1},o},
-  {{4,2},o},
-  {{4,3},b},
-  {{4,4},b},
-  {{4,5},o},
-  {{5,1},w},
-  {{5,2},w},
-  {{5,3},b},
-  {{5,4},o},
-  {{5,5},o}],5].
+{{1,2},w},
+{{1,3},w},
+{{1,4},w},
+{{1,5},w},
+{{2,1},w},
+{{2,2},o},
+{{2,3},w},
+{{2,4},w},
+{{2,5},o},
+{{3,1},b},
+{{3,2},w},
+{{3,3},w},
+{{3,4},w},
+{{3,5},b},
+{{4,1},o},
+{{4,2},o},
+{{4,3},b},
+{{4,4},b},
+{{4,5},o},
+{{5,1},w},
+{{5,2},w},
+{{5,3},b},
+{{5,4},o},
+{{5,5},o}],5].
 
 %przykladowa lista kamieni jednego koloru
 %bs:boardPrint(bs:getTestBoard(),0).
 getTestList() ->
-  getAllColor(b,getTestBoard(),[ ]).
+getAllColor(b,getTestBoard(),[ ]).
 %przykladowa lista sasiedztwa
 getTestNeighbourList() ->
-  listNeighbourLists(getTestList(),[ ]).
+listNeighbourLists(getTestList(),[ ]).
 
 
 
@@ -70,118 +73,118 @@ getTestNeighbourList() ->
 
 %utworzenie pustej planszy
 init(Y) -> 
-  if
-    Y>1 ->
-       [board,[{{X,Z},o}||X<- seq(1,Y),Z<-seq(1,Y)],Y];
-    true ->
-      true
-  end.
+if
+  Y>1 ->
+  [board,[{{X,Z},o}||X<- seq(1,Y),Z<-seq(1,Y)],Y];
+  true ->
+  true
+end.
 
 %wyświetlanie planszy w konsoli (testy/granie w konsoli)
 generateFrame(Size) ->
-  case Size of
-    5 ->
-      io:format(" 1  2  3  4  5 ~n", []),
-      io:format(" -- -- -- -- -- ~n", []);
-    7 ->
-      io:format(" 1  2  3  4  5  6  7 ~n", []),
-      io:format(" -- -- -- -- -- -- -- ~n", []);
-    9 ->
-      io:format(" 1  2  3  4  5  6  7  8  9 ~n", []),
-      io:format(" -- -- -- -- -- -- -- -- -- ~n", []);
-    13 ->
-      io:format(" 1  2  3  4  5  6  7  8  9  10 11 12 13 ~n", []),
-      io:format(" -- -- -- -- -- -- -- -- -- -- -- -- -- ~n", []);
-    19 ->
-      io:format(" 1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 ~n", []),
-      io:format(" -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- ~n", []);
-    _Else ->
-      true
-  end.
+case Size of
+  5 ->
+  io:format(" 1  2  3  4  5 ~n", []),
+  io:format(" -- -- -- -- -- ~n", []);
+  7 ->
+  io:format(" 1  2  3  4  5  6  7 ~n", []),
+  io:format(" -- -- -- -- -- -- -- ~n", []);
+  9 ->
+  io:format(" 1  2  3  4  5  6  7  8  9 ~n", []),
+  io:format(" -- -- -- -- -- -- -- -- -- ~n", []);
+  13 ->
+  io:format(" 1  2  3  4  5  6  7  8  9  10 11 12 13 ~n", []),
+  io:format(" -- -- -- -- -- -- -- -- -- -- -- -- -- ~n", []);
+  19 ->
+  io:format(" 1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 ~n", []),
+  io:format(" -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- ~n", []);
+  _Else ->
+  true
+end.
 
 
 %Przykład: bs:boardPrint(bs:putStone(1,2,1,bs:init(3),[board,[ ],3]),0).
 %Przykład to wyswietlenie planszy bo wlozeniu kamienia.
 boardPrint([board,[{_,A}|[] ],S],_) ->  
 if
-    A==o ->
-      io:format("    |~p ~n", [S]);
-    true ->
-       io:format(" ~p  |~p ~n", [A,S])
+  A==o ->
+  io:format("    |~p ~n", [S]);
+  true ->
+  io:format(" ~p  |~p ~n", [A,S])
 end;
 boardPrint([board,[{_,A}|T],S],Y) ->
-  if
-       (Y == 0) ->
-           generateFrame(S); 
-       true ->
-           true
-  end,    
-  Z=Y+1,
-  if
-    A==o ->
-      io:format("   ", []);
-    true ->
-       io:format(" ~p ", [A])
-  end,
-  if
-      (Z rem S == 0 ) ->
-          io:format(" |~p ~n", [trunc(Z/S)]);
-       true ->
-           true
-  end,
-  boardPrint([board,T,S],Z).
+if
+ (Y == 0) ->
+ generateFrame(S); 
+ true ->
+ true
+end,    
+Z=Y+1,
+if
+  A==o ->
+  io:format("   ", []);
+  true ->
+  io:format(" ~p ", [A])
+end,
+if
+  (Z rem S == 0 ) ->
+  io:format(" |~p ~n", [trunc(Z/S)]);
+  true ->
+  true
+end,
+boardPrint([board,T,S],Z).
 
 %przykład bs:compareBoards(bs:getTestBoard(),bs:init(5)).
 %porównaj dwie plansze tego samego rozmiaru- jesli takie same to zwróć prawdę.
 compareBoards([board,[ ],_],[board,[ ],_]) ->
-  true;
+true;
 compareBoards([board,[{_,A}|T],Size],[board,[{_,A2}|T2],Size]) ->
-  if
-    (A=:=A2) ->
-      compareBoards([board,T,Size],[board,T2,Size]);
-    true ->
-      false
-  end.
+if
+  (A=:=A2) ->
+  compareBoards([board,T,Size],[board,T2,Size]);
+  true ->
+  false
+end.
 
 
 %policz wyniki i wyświetl kto wygrał. Białe dostają komi = 6.5
 whoWon([board,[{{X1,Y1},A}|T],Size]) ->
-  {Black,White} = countTerritories(listTerritoriesSizeOwner(getTerritories([board,[{{X1,Y1},A}|T],Size]),[board,[{{X1,Y1},A}|T],Size],[ ]),{0,0}),
-  BlackScore = len(getAllColor(b,[board,[{{X1,Y1},A}|T],Size],[ ])) + Black,
-  WhiteScore = 6 + len(getAllColor(w,[board,[{{X1,Y1},A}|T],Size],[ ])) + White,
-  if
-    BlackScore> WhiteScore ->
-      black;
-    BlackScore< WhiteScore ->
-      white;
-    BlackScore== WhiteScore ->
-      tie
-  end.
+{Black,White} = countTerritories(listTerritoriesSizeOwner(getTerritories([board,[{{X1,Y1},A}|T],Size]),[board,[{{X1,Y1},A}|T],Size],[ ]),{0,0}),
+BlackScore = len(getAllColor(b,[board,[{{X1,Y1},A}|T],Size],[ ])) + Black,
+WhiteScore = 6 + len(getAllColor(w,[board,[{{X1,Y1},A}|T],Size],[ ])) + White,
+if
+  BlackScore> WhiteScore ->
+  black;
+  BlackScore< WhiteScore ->
+  white;
+  BlackScore== WhiteScore ->
+  tie
+end.
 
 %policz wynik i zwróć krotkę {punkty czarne, punkty białe}
 countTerritories([ ],{Black,White}) ->
-  {Black,White};
+{Black,White};
 countTerritories([{A,O}|T],{Black,White}) ->
-  case O of
-    o ->
-      Bufor = {Black,White};
-    b ->
-      Bufor = {Black + A, White};
-    w ->
-      Bufor = {Black,White + A}
-  end,
-  countTerritories(T,Bufor).
+case O of
+  o ->
+  Bufor = {Black,White};
+  b ->
+  Bufor = {Black + A, White};
+  w ->
+  Bufor = {Black,White + A}
+end,
+countTerritories(T,Bufor).
 
 
 
 %zamien Boarda na prostą listę zawierającą informacje o b/w/o
 % bs:listBoard(bs:getTestBoard(),[ ]).
 listBoard([board,[{_,H}],_],Bufor) ->
-  Bufor ++ [H];
+Bufor ++ [H];
 
 listBoard([board,[{_,H}|T],Y],Bufor) ->
-  Bufor2=Bufor ++ [H],
-  listBoard([board,T,Y],Bufor2).
+Bufor2=Bufor ++ [H],
+listBoard([board,T,Y],Bufor2).
 
 
 
@@ -192,113 +195,113 @@ listBoard([board,[{_,H}|T],Y],Bufor) ->
 
 %pobierz wspolrzędne wszystkich punktów na których jest kamien o kolorze Color
 getAllColor(_,[board,[ ],_], Bufor) ->
-  Bufor;
+Bufor;
 getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],Bufor) ->
-  if
-    (A==Color) -> 
-      Bufor2 = Bufor ++ [{X1,Y1}];
-    true ->
-      Bufor2 = Bufor
-  end,
-  getAllColor(Color,[board,T,Size],Bufor2).
+if
+  (A==Color) -> 
+  Bufor2 = Bufor ++ [{X1,Y1}];
+  true ->
+  Bufor2 = Bufor
+end,
+getAllColor(Color,[board,T,Size],Bufor2).
 
 
 % bs:boardPrint(bs:checkChainsByColor(w,bs:getTestBoard()),0).
 %sprawdzenie chainów  z podanego boarda danego koloru i usunięcie tych, które nie mają liberties
 checkChainsByColor(Color, [board,[{{X1,Y1},A}|T],Size]) ->
-  List = getChains(getChainsRepeated(listNeighbourLists(getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],[ ]),[ ]),[ ]),[ ]),
-  Z = (filter(fun(X) -> not(hasChainLiberties (X,[board,[{{X1,Y1},A}|T],Size])) end, List)),  
-  deleteChainsList(Z,[board,[{{X1,Y1},A}|T],Size]).
+List = getChains(getChainsRepeated(listNeighbourLists(getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],[ ]),[ ]),[ ]),[ ]),
+Z = (filter(fun(X) -> not(hasChainLiberties (X,[board,[{{X1,Y1},A}|T],Size])) end, List)),  
+deleteChainsList(Z,[board,[{{X1,Y1},A}|T],Size]).
 
 
 
 
 %przepusć tylko chainy które mają więcej niż 1 liberties
 getAliveChains([ ],[board,[{{X1,Y1},A}|T],Size],Bufor)->
-  Bufor;
+Bufor;
 
 getAliveChains([H|T],[board,[{{X1,Y1},A}|T2],Size],Bufor)->
-  Liberties=getChainLiberties(H,[board,[{{X1,Y1},A}|T2],Size],[ ]),
-  LibLen=len(Liberties),
-  if
-    LibLen<3 ->
-      getAliveChains(T,[board,[{{X1,Y1},A}|T2],Size],Bufor);
-    true ->
-      getAliveChains(T,[board,[{{X1,Y1},A}|T2],Size],Bufor++[H])
-  end.
+Liberties=getChainLiberties(H,[board,[{{X1,Y1},A}|T2],Size],[ ]),
+LibLen=len(Liberties),
+if
+  LibLen<3 ->
+  getAliveChains(T,[board,[{{X1,Y1},A}|T2],Size],Bufor);
+  true ->
+  getAliveChains(T,[board,[{{X1,Y1},A}|T2],Size],Bufor++[H])
+end.
 
 
 %wybierz najdłuższego chaina
 getLongestChain(Color, [board,[{{X1,Y1},A}|T],Size]) ->
-  List = getChains(getChainsRepeated(listNeighbourLists(getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],[ ]),[ ]),[ ]),[ ]),
-  List2=getAliveChains(List,[board,[{{X1,Y1},A}|T],Size],[ ]),
-  getLongestList(List2,[ ]).
+List = getChains(getChainsRepeated(listNeighbourLists(getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],[ ]),[ ]),[ ]),[ ]),
+List2=getAliveChains(List,[board,[{{X1,Y1},A}|T],Size],[ ]),
+getLongestList(List2,[ ]).
 
 %usun wszystkie lancuchy z listy
 deleteChainsList([ ],Bufor) ->
-  Bufor;
+Bufor;
 deleteChainsList([H|T1],[board,[{{X1,Y1},A}|T],Size]) ->
-  Bufor = deleteChain(H,[board,[{{X1,Y1},A}|T],Size]),
-  deleteChainsList(T1,Bufor). 
+Bufor = deleteChain(H,[board,[{{X1,Y1},A}|T],Size]),
+deleteChainsList(T1,Bufor). 
 
 %usuń cały łańcuch.
 deleteChain([ ],Bufor) ->
-  Bufor;
+Bufor;
 deleteChain([{X,Y}|T1],[board,[{{X1,Y1},A}|T],Size]) ->
-  Bufor = deleteStone(X,Y,[board,[{{X1,Y1},A}|T],Size],[board,[ ],Size]),
-  deleteChain(T1,Bufor).
+Bufor = deleteStone(X,Y,[board,[{{X1,Y1},A}|T],Size],[board,[ ],Size]),
+deleteChain(T1,Bufor).
 
 
 % pobranie wszystkich liberties łańcucha
 getChainLiberties([ ],_,Bufor) -> 
-  Bufor;
+Bufor;
 getChainLiberties([{X,Y}|T1],[board,[{{X1,Y1},A}|T],Size],Bufor) ->
-  Bufor2=Bufor++getNeighboursByColor(o,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0),
-  getChainLiberties(T1,[board,[{{X1,Y1},A}|T],Size],Bufor2).
+Bufor2=Bufor++getNeighboursByColor(o,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0),
+getChainLiberties(T1,[board,[{{X1,Y1},A}|T],Size],Bufor2).
 
 
 %pobranie Chaina który ma najmniej liberties
 getAlmostDeadChain(Color, [board,[{{X1,Y1},A}|T],Size]) ->
- ChainList = getChains(getChainsRepeated(listNeighbourLists(getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],[ ]),[ ]),[ ]),[ ]),
- getAlmostDeadChain2(ChainList,[board,[{{X1,Y1},A}|T],Size],9999,[ ]).
+ChainList = getChains(getChainsRepeated(listNeighbourLists(getAllColor(Color,[board,[{{X1,Y1},A}|T],Size],[ ]),[ ]),[ ]),[ ]),
+getAlmostDeadChain2(ChainList,[board,[{{X1,Y1},A}|T],Size],9999,[ ]).
 
 
 %pomocnicza dla getAlmostDeadChain, do Bufora wrzucić coś wielkiego, Bufor2 [] bo tam będzie ten łańcuch wynikowy
 getAlmostDeadChain2([ ], _,_,Bufor2)->
-  Bufor2;
+Bufor2;
 
 getAlmostDeadChain2([H2|T2], [board,[{{X1,Y1},A}|T],Size],Bufor,Bufor2)->
-  LenLib=len(getChainLiberties(H2,[board,[{{X1,Y1},A}|T],Size],[ ])),
-  if
-    LenLib>Bufor ->
-      getAlmostDeadChain2(T2, [board,[{{X1,Y1},A}|T],Size],Bufor, Bufor2);
-    LenLib=<Bufor ->
-      getAlmostDeadChain2(T2, [board,[{{X1,Y1},A}|T],Size],LenLib, H2)
-  end.
+LenLib=len(getChainLiberties(H2,[board,[{{X1,Y1},A}|T],Size],[ ])),
+if
+  LenLib>Bufor ->
+  getAlmostDeadChain2(T2, [board,[{{X1,Y1},A}|T],Size],Bufor, Bufor2);
+  LenLib=<Bufor ->
+  getAlmostDeadChain2(T2, [board,[{{X1,Y1},A}|T],Size],LenLib, H2)
+end.
 
 
 % sprawdzanie, czy łancuch ma liberties
 hasChainLiberties([ ],_) -> 
-  false;
+false;
 hasChainLiberties([{X,Y}|T1],[board,[{{X1,Y1},A}|T],Size]) ->
-  case len(getNeighboursByColor(o,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0)) of
-    0 ->
-       hasChainLiberties(T1,[board,[{{X1,Y1},A}|T],Size]);
-    _ -> true
-  end.
+case len(getNeighboursByColor(o,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0)) of
+  0 ->
+  hasChainLiberties(T1,[board,[{{X1,Y1},A}|T],Size]);
+  _ -> true
+end.
 
 %pobierz wszystkie łańcuchy terytoriów, podaj ich listę {ilosc,wlasciciel}
 % przyklad bs:listTerritoriesSizeOwner(bs:getTerritories(bs:getTestBoard()),bs:getTestBoard(),[ ]).
 listTerritoriesSizeOwner([ ],_,Bufor) ->
-  Bufor;
+Bufor;
 listTerritoriesSizeOwner([H|T1],[board,[{{X1,Y1},A}|T],Size],Bufor) ->
-  Bufor2 = Bufor ++ [territorySizeOwner(H,[board,[{{X1,Y1},A}|T],Size],0,0,0)],
-  listTerritoriesSizeOwner(T1,[board,[{{X1,Y1},A}|T],Size],Bufor2). 
+Bufor2 = Bufor ++ [territorySizeOwner(H,[board,[{{X1,Y1},A}|T],Size],0,0,0)],
+listTerritoriesSizeOwner(T1,[board,[{{X1,Y1},A}|T],Size],Bufor2). 
 
 
 %lista wszystkich territories
 getTerritories([board,[{{X1,Y1},A}|T],Size]) ->
-  getChains(getChainsRepeated(listNeighbourLists(getAllColor(o,[board,[{{X1,Y1},A}|T],Size],[ ]),[ ]),[ ]),[ ]).
+getChains(getChainsRepeated(listNeighbourLists(getAllColor(o,[board,[{{X1,Y1},A}|T],Size],[ ]),[ ]),[ ]),[ ]).
 
 %przykład  bs:territorySizeOwner([{2,5},{1,5}],bs:getTestBoard(),0,0,0).
 % sprawdzanie, czy łańcuch pustych pól jest otoczony przez jakiś kolor
@@ -306,44 +309,44 @@ getTerritories([board,[{{X1,Y1},A}|T],Size]) ->
 %zadaj łańcuch pustych pól, planszę i parametry:
 %Amount = 0, White = 0, Black = 0 na starcie
 territorySizeOwner([ ],_,White,Black,D) -> 
-  if
-    (White>0) and (Black>0) ->
-      {D,o};
-    (White==0) and (Black==0) ->
-      {D,o};
-    (White==0) and (Black>0) ->
-      {D,b};
-    (Black==0) and (White>0) ->  
-      {D,w}
-  end;
+if
+  (White>0) and (Black>0) ->
+  {D,o};
+  (White==0) and (Black==0) ->
+  {D,o};
+  (White==0) and (Black>0) ->
+  {D,b};
+  (Black==0) and (White>0) ->  
+  {D,w}
+end;
 
 
 %  list:len(bs:getNeighboursByColor(b,1,2,bs:getTestBoard(),[ ],0)).
 territorySizeOwner([{X,Y}|T1],[board,[{{X1,Y1},A}|T],Size],White,Black,Amount) ->
-  B = Black + len(getNeighboursByColor(b,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0)),
-  W = White + len(getNeighboursByColor(w,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0)),
-  D = Amount + 1,
-  territorySizeOwner(T1,[board,[{{X1,Y1},A}|T],Size],W,B,D).
+B = Black + len(getNeighboursByColor(b,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0)),
+W = White + len(getNeighboursByColor(w,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0)),
+D = Amount + 1,
+territorySizeOwner(T1,[board,[{{X1,Y1},A}|T],Size],W,B,D).
 
 
 %bs:getChains(bs:getChainsRepeated(bs:listNeighbourLists(bs:getAllColor(b,bs:getTestBoard(),[ ]),[ ]),[ ]),[ ]).
 %wyczysc liste z getChainsRepeated na postawie listy z Repeated. Bufor [].
 getChains([ ], Bufor) ->
-  Bufor;
+Bufor;
 
 
 getChains([H|T], Bufor) ->
-  Q= remove_dups(flatten(filter(fun(G) -> listHasSameItem (G,H) end, T))),
-  W=remove_dups(Q++H),
-  if 
-    Q /= [] ->
-       Z = [W] ++ (filter(fun(X) -> not(listHasSameItem (X,H)) end, T)),
-       Bufor2=Bufor;
-    true ->
-       Z = (filter(fun(X) -> not(listHasSameItem (X,H)) end, T)),
-       Bufor2=Bufor ++ [W]
-  end,
-  getChains(Z,Bufor2).
+Q= remove_dups(flatten(filter(fun(G) -> listHasSameItem (G,H) end, T))),
+W=remove_dups(Q++H),
+if 
+  Q /= [] ->
+  Z = [W] ++ (filter(fun(X) -> not(listHasSameItem (X,H)) end, T)),
+  Bufor2=Bufor;
+  true ->
+  Z = (filter(fun(X) -> not(listHasSameItem (X,H)) end, T)),
+  Bufor2=Bufor ++ [W]
+end,
+getChains(Z,Bufor2).
 
 
 %bs:getChainsRepeated(bs:listNeighbourLists(bs:getAllColor(b,bs:getTestBoard(),[ ]),[ ]),[ ]).
@@ -351,24 +354,24 @@ getChains([H|T], Bufor) ->
 %usun duplikaty W listach
 %pomocnicza. Bufor [].
 getChainsRepeated([ ],Bufor) ->
-  Bufor;
+Bufor;
 getChainsRepeated([H|T],Bufor) ->
-  Z = [flatten(filter(fun(X) -> listHasSameItem (X,H) end, T) ++ H)],
-  Z2 = remove_dups_list(Z,[ ]),
-  Bufor2 = Bufor ++ Z2,
-  getChainsRepeated(T,Bufor2).
+Z = [flatten(filter(fun(X) -> listHasSameItem (X,H) end, T) ++ H)],
+Z2 = remove_dups_list(Z,[ ]),
+Bufor2 = Bufor ++ Z2,
+getChainsRepeated(T,Bufor2).
 
 
 %generuj listę "sąsiadów i siebie" dla każdego punktu z zadanej listy.
 %main:listNeighbourLists([{1,2},{2,2},{1,4}],[ ]).
 %używać z getAllColor!
 listNeighbourLists([],Bufor) ->
-  Bufor;
+Bufor;
 listNeighbourLists([{X,Y}|T],Bufor) ->
-  Z = getNeighbours(X,Y,T,[ ],0),
-  W = Z ++ [{X,Y}],
-  Bufor2=Bufor ++ [W],
-  listNeighbourLists(T,Bufor2).
+Z = getNeighbours(X,Y,T,[ ],0),
+W = Z ++ [{X,Y}],
+Bufor2=Bufor ++ [W],
+listNeighbourLists(T,Bufor2).
 
 
 
@@ -382,70 +385,70 @@ listNeighbourLists([{X,Y}|T],Bufor) ->
 % przykład  bs:putStoneChecked(b,1,1,[bs:init(19),bs:getTestBoard()]).
 %sprawdza: czy cos tam juz nie stoi, czy otoczenie nie jest wrogie, czy indeks jest ok,czy ruch się nie powtarza
 putStoneChecked(Color,X,Y,[[board,[{{X1,Y1},A}|T],Size], SecondBoard]) ->
-  LenMy=len(getNeighboursByColor(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0)),
-  LenO=len(getNeighboursByColor(o,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0)),
+LenMy=len(getNeighboursByColor(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0)),
+LenO=len(getNeighboursByColor(o,X,Y,[board,[{{X1,Y1},A}|T],Size],[ ],0)),
 
 
    %trzeba pobrać kolor tego czegoś
    ThisColor=getColor(X,Y,[board,[{{X1,Y1},A}|T],Size]),
-  if
-      (ThisColor =/=o) ->
-        [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
-      (LenMy==0) and  (LenO==0)->
-        [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
+   if
+    (ThisColor =/=o) ->
+    [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
+    (LenMy==0) and  (LenO==0)->
+    [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
 
-      (X<1) or (Y<1) ->
-        [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
+    (X<1) or (Y<1) ->
+    [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
 
-      true ->
-           case (putStone(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[board,[ ],Size])) of
-        SecondBoard->
-          [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
+    true ->
+    case (putStone(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[board,[ ],Size])) of
+      SecondBoard->
+      [[board,[{{X1,Y1},A}|T],Size] , SecondBoard];
 
-        _Else ->
-          [ putStone(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[board,[ ],Size]) , [board,[{{X1,Y1},A}|T],Size] ]
-        end
+      _Else ->
+      [ putStone(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[board,[ ],Size]) , [board,[{{X1,Y1},A}|T],Size] ]
+    end
   end.
 
 %wstaw kamien o danym kolorze w dane pole danej planszy 
 %zwroc nowa, zmieniona plansze
 % Przykład użycia: main:putStone(1,2,1,main:init(3),[board,[ ],3]).
 putStone(_,_,_,[board,[ ],_],Bufor) -> 
-  Bufor;
+Bufor;
 putStone(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],[board,E,Size]) ->
-  if 
-      (X==X1) and (Y==Y1) ->
-          Bufor = [board,E++[{{X,Y},Color}],Size];
-      true -> 
-          Bufor = [board,E++[{{X1,Y1},A}],Size]
-  end,
-  putStone(Color,X,Y,[board,T,Size],Bufor).
+if 
+  (X==X1) and (Y==Y1) ->
+  Bufor = [board,E++[{{X,Y},Color}],Size];
+  true -> 
+  Bufor = [board,E++[{{X1,Y1},A}],Size]
+end,
+putStone(Color,X,Y,[board,T,Size],Bufor).
 
 %usun kamien z danego miejsa danej planszy
 %Przykład main:boardPrint(main:deleteStone(5,1,main:putStone(c,5,1,main:init(9),[board,[ ],9]),[board,[ ],9]),0).
 %Przykład to usuniecie kamienia z miejsa na które go postawilismy przed chwila
 deleteStone(_,_,[board,[ ],_],Bufor) -> 
-    Bufor;
+Bufor;
 deleteStone(X,Y,[board,[{{X1,Y1},A}|T],Size],[board,E,Size]) ->
-  if 
-      (X==X1) and (Y==Y1) ->
-        Bufor = [board,E++[{{X,Y},o}],Size];
-      true -> 
-        Bufor = [board,E++[{{X1,Y1},A}],Size]
-   end,
-  deleteStone(X,Y,[board,T,Size],Bufor).
+if 
+  (X==X1) and (Y==Y1) ->
+  Bufor = [board,E++[{{X,Y},o}],Size];
+  true -> 
+  Bufor = [board,E++[{{X1,Y1},A}],Size]
+end,
+deleteStone(X,Y,[board,T,Size],Bufor).
 
 %Sprawdzenie pola - zwraca Kolor
 getColor(X,Y,[board,[],_]) ->
-   io:format("Nie istnieje pole ~p,~p ~n",[X,Y]);
+io:format("Nie istnieje pole ~p,~p ~n",[X,Y]);
 
 getColor(X,Y,[board,[{{X1,Y1},A}|T],Size]) ->
-   if 
-      (X==X1) and (Y==Y1) ->
-        A;
-      true -> 
-        getColor(X,Y,[board,T,Size])        
-    end. 
+if 
+  (X==X1) and (Y==Y1) ->
+  A;
+  true -> 
+  getColor(X,Y,[board,T,Size])        
+end. 
 
 
 % list:len(bs:getNeighboursByColor(o,1,4,bs:getTestBoard(),[ ],0)).
@@ -453,39 +456,39 @@ getColor(X,Y,[board,[{{X1,Y1},A}|T],Size]) ->
 %main:getNeighbours(b,3,3,main:getTestBoard(),[ ],0).
 %(bs:getNeighboursByColor(o,1,4,bs:getTestBoard(),[ ],0)).
 getNeighboursByColor(_,_,_,[board,[ ],_],Bufor,_) ->
-  Bufor;
+Bufor;
 getNeighboursByColor(Color,X,Y,[board,[{{X1,Y1},A}|T],Size],Bufor,Counter) ->
+if
+  (Counter < 4) ->
   if
-    (Counter < 4) ->
-      if
-        (Color == A) and ((abs(X-X1)+abs(Y-Y1))==1) ->
-          Counter2 = Counter +1,
-          Bufor2 = Bufor ++ [{X1,Y1}];
-       true ->
-          Bufor2=Bufor,
-          Counter2 = Counter
-      end,
-      getNeighboursByColor(Color,X,Y,[board,T,Size],Bufor2,Counter2);
+    (Color == A) and ((abs(X-X1)+abs(Y-Y1))==1) ->
+    Counter2 = Counter +1,
+    Bufor2 = Bufor ++ [{X1,Y1}];
     true ->
-      Bufor
-  end.
- 
+    Bufor2=Bufor,
+    Counter2 = Counter
+  end,
+  getNeighboursByColor(Color,X,Y,[board,T,Size],Bufor2,Counter2);
+  true ->
+  Bufor
+end.
+
 
 %% pobierz sasiadów z listy. Bufor [ ] na start. Counter na 0.
 getNeighbours(_,_,[ ],Bufor,_) ->
-  Bufor;
+Bufor;
 getNeighbours(X,Y,[{X1,Y1}|T],Bufor,Counter) ->
+if
+  (Counter < 4) ->
   if
-    (Counter < 4) ->
-      if
-        ((abs(X-X1)+abs(Y-Y1))==1) ->
-          Counter2 = Counter +1,
-          Bufor2 = Bufor ++ [{X1,Y1}];
-       true ->
-          Bufor2=Bufor,
-          Counter2 = Counter
-      end,
-      getNeighbours(X,Y,T,Bufor2,Counter2);
+    ((abs(X-X1)+abs(Y-Y1))==1) ->
+    Counter2 = Counter +1,
+    Bufor2 = Bufor ++ [{X1,Y1}];
     true ->
-      Bufor
-  end.
+    Bufor2=Bufor,
+    Counter2 = Counter
+  end,
+  getNeighbours(X,Y,T,Bufor2,Counter2);
+  true ->
+  Bufor
+end.

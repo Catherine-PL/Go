@@ -1,3 +1,6 @@
+// author: Katarzyna Kosiak
+
+
 package go.game.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;

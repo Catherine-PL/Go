@@ -1,3 +1,6 @@
+// author: Katarzyna Kosiak
+
+
 package go.game;
 
 
